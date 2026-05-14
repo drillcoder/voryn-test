@@ -5,9 +5,9 @@ const chainId = 1;
 const logger = new ConsoleLogger({ minLevel: "info" });
 const config = {
   chainId,
-  delayBetweenTicksMs: Number(process.env.REACTION_DELAY_MS ?? 100),
+  delayBetweenTicksMs: 100,
   workerName: "transaction-reaction-worker",
-  batchSize: Number(process.env.TRANSACTION_REACTION_BATCH_SIZE ?? 1_000),
+  batchSize: 1_000,
 };
 const handler = {
   async handle(tx) {
