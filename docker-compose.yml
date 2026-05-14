@@ -2,6 +2,8 @@ x-app-env: &app-env
   DB_URL: postgres://user:pass@postgres:5432/voryn
   ETH_RPC_URL: https://ethereum-rpc.publicnode.com
   ETH_CHAIN_ID: 1
+  BSC_RPC_URL: https://bsc-rpc.publicnode.com
+  BSC_CHAIN_ID: 56
 
 x-app: &app
   image: voryn-test-app:local
@@ -35,29 +37,53 @@ services:
       timeout: 5s
       retries: 10
 
-  head:
+  eth-head:
     <<: *app
     command: [ "node", "src/eth/head.js" ]
 
-  fetch:
+  eth-fetch:
     <<: *app
     command: [ "node", "src/eth/fetch.js" ]
 
-  sequencer:
+  eth-sequencer:
     <<: *app
     command: [ "node", "src/eth/sequencer.js" ]
 
-  retention:
+  eth-retention:
     <<: *app
     command: [ "node", "src/eth/retention.js" ]
 
-  transaction-reaction:
+  eth-transaction-reaction:
     <<: *app
     command: [ "node", "src/eth/transaction-reaction.js" ]
 
-  event-reaction:
+  eth-event-reaction:
     <<: *app
     command: [ "node", "src/eth/event-reaction.js" ]
+
+  bsc-head:
+    <<: *app
+    command: [ "node", "src/bsc/head.js" ]
+
+  bsc-fetch:
+    <<: *app
+    command: [ "node", "src/bsc/fetch.js" ]
+
+  bsc-sequencer:
+    <<: *app
+    command: [ "node", "src/bsc/sequencer.js" ]
+
+  bsc-retention:
+    <<: *app
+    command: [ "node", "src/bsc/retention.js" ]
+
+  bsc-transaction-reaction:
+    <<: *app
+    command: [ "node", "src/bsc/transaction-reaction.js" ]
+
+  bsc-event-reaction:
+    <<: *app
+    command: [ "node", "src/bsc/event-reaction.js" ]
 
   metrics:
     <<: *app
