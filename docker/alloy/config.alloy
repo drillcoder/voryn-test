@@ -1,4 +1,4 @@
-prometheus.scrape "voryn" {
+prometheus.scrape "voryn_eth" {
   targets = [
     { "__address__" = "metrics:8080" },
   ]
