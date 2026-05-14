@@ -64,5 +64,11 @@ services:
     <<: *app
     command: [ "node", "src/eth/retention.js" ]
 
+  metrics-console:
+    <<: *app
+    profiles: [ "tools" ]
+    command: [ "node", "src/eth/metrics-console.js" ]
+    restart: "no"
+
 volumes:
   postgres_data:
