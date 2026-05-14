@@ -1,0 +1,68 @@
+x-app: &app
+  image: voryn-test-app:local
+  build:
+    context: .
+    dockerfile: docker/app/Dockerfile
+  environment:
+    DB_URL: postgres://user:pass@postgres:5432/voryn
+
+    CONFIRMATIONS: ${CONFIRMATIONS:-0}
+    HEAD_DELAY_MS: ${HEAD_DELAY_MS:-1000}
+    HEAD_DEPTH_BLOCKS: ${HEAD_DEPTH_BLOCKS:-10000}
+    FETCH_DELAY_MS: ${FETCH_DELAY_MS:-100}
+    FETCH_BATCH_SIZE: ${FETCH_BATCH_SIZE:-10}
+    FETCH_CLAIM_TTL_MS: ${FETCH_CLAIM_TTL_MS:-125000}
+    RETRY_MAX_ATTEMPTS: ${RETRY_MAX_ATTEMPTS:-10}
+    RETRY_BASE_DELAY_MS: ${RETRY_BASE_DELAY_MS:-1000}
+    RETRY_MAX_DELAY_MS: ${RETRY_MAX_DELAY_MS:-10000}
+    SEQUENCER_DELAY_MS: ${SEQUENCER_DELAY_MS:-100}
+    SEQUENCER_MAX_BLOCKS_PER_TICK: ${SEQUENCER_MAX_BLOCKS_PER_TICK:-10}
+    RETENTION_DELAY_MS: ${RETENTION_DELAY_MS:-60000}
+    RETENTION_DEPTH_BLOCKS: ${RETENTION_DEPTH_BLOCKS:-10000}
+    PORT: 8080
+  depends_on:
+    postgres:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: voryn
+    command:
+      - postgres
+      - -c
+      - shared_buffers=64MB
+      - -c
+      - max_connections=30
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DB:-voryn}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  head:
+    <<: *app
+    command: [ "node", "src/eth/head.js" ]
+
+  fetch:
+    <<: *app
+    command: [ "node", "src/eth/fetch.js" ]
+
+  sequencer:
+    <<: *app
+    command: [ "node", "src/eth/sequencer.js" ]
+
+  retention:
+    <<: *app
+    command: [ "node", "src/eth/retention.js" ]
+
+volumes:
+  postgres_data:

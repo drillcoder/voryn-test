@@ -1,0 +1,10 @@
+{
+  "name": "voryn-test",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "@drillcoder/voryn": "^0.1.14"
+  },
+  "private": true
+}
