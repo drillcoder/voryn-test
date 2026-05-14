@@ -19,6 +19,9 @@ x-app: &app
     SEQUENCER_MAX_BLOCKS_PER_TICK: ${SEQUENCER_MAX_BLOCKS_PER_TICK:-10}
     RETENTION_DELAY_MS: ${RETENTION_DELAY_MS:-60000}
     RETENTION_DEPTH_BLOCKS: ${RETENTION_DEPTH_BLOCKS:-10000}
+    REACTION_DELAY_MS: ${REACTION_DELAY_MS:-100}
+    TRANSACTION_REACTION_WORKER_NAME: ${TRANSACTION_REACTION_WORKER_NAME:-transaction-reaction-worker}
+    TRANSACTION_REACTION_BATCH_SIZE: ${TRANSACTION_REACTION_BATCH_SIZE:-1000}
     PORT: 8080
   depends_on:
     postgres:
@@ -63,6 +66,10 @@ services:
   retention:
     <<: *app
     command: [ "node", "src/eth/retention.js" ]
+
+  transaction-reaction:
+    <<: *app
+    command: [ "node", "src/eth/transaction-reaction.js" ]
 
   metrics-console:
     <<: *app

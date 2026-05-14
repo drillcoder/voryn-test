@@ -59,8 +59,12 @@ try {
     })));
   }
 
-  if (snapshot.reactions.length > 0) {
-    console.log("");
+  console.log("");
+  console.log("reactions:");
+
+  if (snapshot.reactions.length === 0) {
+    console.log("empty");
+  } else {
     console.table(snapshot.reactions.map((reaction) => ({
       worker: reaction.workerName,
       stream: reaction.streamType,
