@@ -1,0 +1,21 @@
+prometheus.scrape "voryn_eth" {
+  targets = [
+    { "__address__" = "metrics:8080" },
+  ]
+
+  metrics_path     = "/metrics"
+  scrape_interval  = "10s"
+  scrape_timeout   = "5s"
+  forward_to       = [prometheus.remote_write.grafana_cloud.receiver]
+}
+
+prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = sys.env("GRAFANA_CLOUD_PROM_REMOTE_WRITE_URL")
+
+    basic_auth {
+      username = sys.env("GRAFANA_CLOUD_PROM_USERNAME")
+      password = sys.env("GRAFANA_CLOUD_API_TOKEN")
+    }
+  }
+}

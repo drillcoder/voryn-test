@@ -19,7 +19,6 @@ x-app: &app
     SEQUENCER_MAX_BLOCKS_PER_TICK: ${SEQUENCER_MAX_BLOCKS_PER_TICK:-10}
     RETENTION_DELAY_MS: ${RETENTION_DELAY_MS:-60000}
     RETENTION_DEPTH_BLOCKS: ${RETENTION_DEPTH_BLOCKS:-10000}
-    PORT: 8080
   depends_on:
     postgres:
       condition: service_healthy
@@ -71,6 +70,30 @@ services:
   event-reaction:
     <<: *app
     command: [ "node", "src/eth/event-reaction.js" ]
+
+  metrics:
+    <<: *app
+    command: [ "node", "src/metrics.js" ]
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  alloy:
+    image: grafana/alloy:latest
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+    environment:
+      GRAFANA_CLOUD_PROM_REMOTE_WRITE_URL: ${GRAFANA_CLOUD_PROM_REMOTE_WRITE_URL}
+      GRAFANA_CLOUD_PROM_USERNAME: ${GRAFANA_CLOUD_PROM_USERNAME}
+      GRAFANA_CLOUD_API_TOKEN: ${GRAFANA_CLOUD_API_TOKEN}
+    ports:
+      - "127.0.0.1:12345:12345"
+    volumes:
+      - ./docker/alloy/config.alloy:/etc/alloy/config.alloy:ro
+    depends_on:
+      - metrics
+    restart: unless-stopped
 
   metrics-console:
     <<: *app
