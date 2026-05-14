@@ -1,19 +1,16 @@
 import { createServer } from "node:http";
 import { ConsoleLogger, PipelineMetrics } from "@drillcoder/voryn";
 
-const dbUrl = process.env.DB_URL ?? "postgres://user:pass@postgres:5432/voryn";
-const rpcUrl = "https://ethereum-rpc.publicnode.com";
-const port = 8080;
-const chainId = 1;
-const confirmations = Number(process.env.CONFIRMATIONS ?? 0);
+const config = {
+    chainId: Number(process.env.ETH_CHAIN_ID),
+};
 
 const logger = new ConsoleLogger({ minLevel: "info" });
-const metrics = await PipelineMetrics.create({
-  config: { chainId, confirmations },
-  logger,
-  dbUrl,
-  rpcUrl,
-});
+const dbUrl = process.env.DB_URL;
+const rpcUrl = process.env.ETH_RPC_URL;
+const port = Number(process.env.PORT);
+
+const metrics = await PipelineMetrics.create({ config, logger, dbUrl, rpcUrl });
 
 function sendText(response, statusCode, body, contentType = "text/plain; charset=utf-8") {
   response.writeHead(statusCode, {
@@ -50,7 +47,7 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(port, () => {
-  logger.info("metrics_server_started", { port, chainId });
+  logger.info("metrics_server_started", { port, chainId: config.chainId });
 });
 
 async function shutdown() {

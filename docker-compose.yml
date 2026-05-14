@@ -1,24 +1,14 @@
+x-app-env: &app-env
+  DB_URL: postgres://user:pass@postgres:5432/voryn
+  ETH_RPC_URL: https://ethereum-rpc.publicnode.com
+  ETH_CHAIN_ID: 1
+
 x-app: &app
   image: voryn-test-app:local
   build:
     context: .
     dockerfile: docker/app/Dockerfile
-  environment:
-    DB_URL: postgres://user:pass@postgres:5432/voryn
-
-    CONFIRMATIONS: ${CONFIRMATIONS:-0}
-    HEAD_DELAY_MS: ${HEAD_DELAY_MS:-1000}
-    HEAD_DEPTH_BLOCKS: ${HEAD_DEPTH_BLOCKS:-10000}
-    FETCH_DELAY_MS: ${FETCH_DELAY_MS:-100}
-    FETCH_BATCH_SIZE: ${FETCH_BATCH_SIZE:-10}
-    FETCH_CLAIM_TTL_MS: ${FETCH_CLAIM_TTL_MS:-125000}
-    RETRY_MAX_ATTEMPTS: ${RETRY_MAX_ATTEMPTS:-10}
-    RETRY_BASE_DELAY_MS: ${RETRY_BASE_DELAY_MS:-1000}
-    RETRY_MAX_DELAY_MS: ${RETRY_MAX_DELAY_MS:-10000}
-    SEQUENCER_DELAY_MS: ${SEQUENCER_DELAY_MS:-100}
-    SEQUENCER_MAX_BLOCKS_PER_TICK: ${SEQUENCER_MAX_BLOCKS_PER_TICK:-10}
-    RETENTION_DELAY_MS: ${RETENTION_DELAY_MS:-60000}
-    RETENTION_DEPTH_BLOCKS: ${RETENTION_DEPTH_BLOCKS:-10000}
+  environment: *app-env
   depends_on:
     postgres:
       condition: service_healthy
@@ -37,8 +27,6 @@ services:
       - shared_buffers=64MB
       - -c
       - max_connections=30
-    ports:
-      - "127.0.0.1:5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -74,6 +62,9 @@ services:
   metrics:
     <<: *app
     command: [ "node", "src/metrics.js" ]
+    environment:
+      <<: *app-env
+      PORT: 8080
     ports:
       - "127.0.0.1:8080:8080"
 
@@ -87,19 +78,11 @@ services:
       GRAFANA_CLOUD_PROM_REMOTE_WRITE_URL: ${GRAFANA_CLOUD_PROM_REMOTE_WRITE_URL}
       GRAFANA_CLOUD_PROM_USERNAME: ${GRAFANA_CLOUD_PROM_USERNAME}
       GRAFANA_CLOUD_API_TOKEN: ${GRAFANA_CLOUD_API_TOKEN}
-    ports:
-      - "127.0.0.1:12345:12345"
     volumes:
       - ./docker/alloy/config.alloy:/etc/alloy/config.alloy:ro
     depends_on:
       - metrics
     restart: unless-stopped
-
-  metrics-console:
-    <<: *app
-    profiles: [ "tools" ]
-    command: [ "node", "src/eth/metrics-console.js" ]
-    restart: "no"
 
 volumes:
   postgres_data:
