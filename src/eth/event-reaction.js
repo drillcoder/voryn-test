@@ -2,7 +2,7 @@ import {ConsoleLogger, EventReactionWorker} from "@drillcoder/voryn";
 
 const config = {
     chainId: Number(process.env.ETH_CHAIN_ID),
-    delayBetweenTicksMs: 500,
+    delayBetweenTicksMs: 250,
     workerName: "event-reaction-worker",
     batchSize: 10_000,
 };
