@@ -1,10 +1,10 @@
 x-app-env: &app-env
   NODE_ENV: production
   DB_URL: postgres://user:pass@postgres:5432/voryn
-  ETH_RPC_URL: https://ethereum-rpc.publicnode.com
   ETH_CHAIN_ID: 1
-  BSC_RPC_URL: https://bsc-rpc.publicnode.com
+  ETH_RPC_URL: https://ethereum-rpc.publicnode.com
   BSC_CHAIN_ID: 56
+  BSC_RPC_URL: https://bsc-rpc.publicnode.com
 
 x-app: &app
   image: node:24-bookworm-slim

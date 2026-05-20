@@ -13,7 +13,7 @@ const config = {
 
 const logger = new ConsoleLogger({minLevel: "debug"});
 const dbUrl = process.env.DB_URL;
-const rpcUrl = 'https://rpc-bsc.48.club';
+const rpcUrl = process.env.BSC_RPC_URL;
 
 const worker = await FetchWorker.create({config, logger, dbUrl, rpcUrl});
 
