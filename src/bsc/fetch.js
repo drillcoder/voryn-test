@@ -3,7 +3,7 @@ import {ConsoleLogger, FetchWorker} from "@drillcoder/voryn";
 const config = {
     chainId: Number(process.env.BSC_CHAIN_ID),
     delayBetweenTicksMs: 500,
-    fetchBatchSize: 10,
+    fetchBatchSize: 20,
     fetchClaimTtlMs: 30_000,
     retryMaxAttempts: 10,
     retryBaseDelayMs: 1_000,
