@@ -10,7 +10,7 @@ const config = {
     retryMaxDelayMs: 10_000,
 };
 
-const logger = new ConsoleLogger({minLevel: "info"});
+const logger = new ConsoleLogger({minLevel: "debug"});
 const dbUrl = process.env.DB_URL;
 const rpcUrl = process.env.BSC_RPC_URL;
 
