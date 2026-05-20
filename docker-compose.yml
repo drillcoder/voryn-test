@@ -15,8 +15,6 @@ x-app: &app
     - ./src:/app/src:ro
     - ./node_modules:/app/node_modules:ro
   depends_on:
-    app-deps:
-      condition: service_completed_successfully
     postgres:
       condition: service_healthy
   restart: unless-stopped
