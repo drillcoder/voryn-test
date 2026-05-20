@@ -57,6 +57,12 @@ services:
     <<: *app
     command: [ "node", "src/eth/event-reaction.js" ]
 
+  eth-block-job-recovery:
+    <<: *app
+    profiles: [ "tools" ]
+    entrypoint: [ "node", "src/eth/block-job-recovery.js" ]
+    restart: "no"
+
   bsc-head:
     <<: *app
     command: [ "node", "src/bsc/head.js" ]
@@ -80,6 +86,12 @@ services:
   bsc-event-reaction:
     <<: *app
     command: [ "node", "src/bsc/event-reaction.js" ]
+
+  bsc-block-job-recovery:
+    <<: *app
+    profiles: [ "tools" ]
+    entrypoint: [ "node", "src/bsc/block-job-recovery.js" ]
+    restart: "no"
 
   metrics:
     <<: *app
