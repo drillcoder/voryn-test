@@ -4,13 +4,14 @@ const config = {
     chainId: Number(process.env.ETH_CHAIN_ID),
     delayBetweenTicksMs: 1_000,
     fetchBatchSize: 5,
+    fetchConcurrency: 1,
     fetchClaimTtlMs: 30_000,
     retryMaxAttempts: 10,
     retryBaseDelayMs: 1_000,
     retryMaxDelayMs: 10_000,
 };
 
-const logger = new ConsoleLogger({minLevel: "info"});
+const logger = new ConsoleLogger({minLevel: "debug"});
 const dbUrl = process.env.DB_URL;
 const rpcUrl = process.env.ETH_RPC_URL;
 
