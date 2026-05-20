@@ -1,4 +1,5 @@
 x-app-env: &app-env
+  NODE_ENV: production
   DB_URL: postgres://user:pass@postgres:5432/voryn
   ETH_RPC_URL: https://ethereum-rpc.publicnode.com
   ETH_CHAIN_ID: 1
@@ -6,17 +7,33 @@ x-app-env: &app-env
   BSC_CHAIN_ID: 56
 
 x-app: &app
-  image: voryn-test-app:local
-  build:
-    context: .
-    dockerfile: docker/app/Dockerfile
+  image: node:24-bookworm-slim
+  working_dir: /app
   environment: *app-env
+  volumes:
+    - ./package.json:/app/package.json:ro
+    - ./src:/app/src:ro
+    - ./node_modules:/app/node_modules:ro
   depends_on:
+    app-deps:
+      condition: service_completed_successfully
     postgres:
       condition: service_healthy
   restart: unless-stopped
 
 services:
+  app-deps:
+    image: node:24-bookworm-slim
+    working_dir: /app
+    environment:
+      NODE_ENV: production
+    command: [ "npm", "ci", "--omit=dev" ]
+    volumes:
+      - ./package.json:/app/package.json:ro
+      - ./package-lock.json:/app/package-lock.json:ro
+      - ./node_modules:/app/node_modules
+    restart: "no"
+
   postgres:
     image: postgres:16-alpine
     environment:
@@ -113,7 +130,7 @@ services:
       GRAFANA_CLOUD_PROM_USERNAME: ${GRAFANA_CLOUD_PROM_USERNAME}
       GRAFANA_CLOUD_API_TOKEN: ${GRAFANA_CLOUD_API_TOKEN}
     volumes:
-      - ./docker/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ./config.alloy:/etc/alloy/config.alloy:ro
     depends_on:
       - metrics
     restart: unless-stopped
