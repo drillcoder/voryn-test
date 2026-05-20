@@ -4,7 +4,7 @@ const config = {
     chainId: Number(process.env.ETH_CHAIN_ID),
     delayBetweenTicksMs: 500,
     workerName: "event-reaction-worker",
-    batchSize: 2_500,
+    batchSize: 5_000,
 };
 
 const logger = new ConsoleLogger({minLevel: "info"});
