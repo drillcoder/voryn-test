@@ -1,5 +1,4 @@
-import {ConsoleLogger, PostgresEventsRepository} from "@drillcoder/voryn";
-import {startBatchedReactionWorker} from "./batched-reaction-worker.js";
+import {ConsoleLogger, EventReactionWorker} from "@drillcoder/voryn";
 
 const config = {
     chainId: Number(process.env.BSC_CHAIN_ID),
@@ -38,33 +37,9 @@ const handler = {
     },
 };
 
-await startBatchedReactionWorker({
-    config,
-    logger,
-    dbUrl,
-    lockKey,
-    streamType: "event",
-    sourceName: "event",
-    repositoryFactory: (pool) => new PostgresEventsRepository(pool),
-    listAfterPosition: (repository, chainId, maxBlockNumber, position, limit) => (
-        repository.listAfterPosition(
-            chainId,
-            maxBlockNumber,
-            position.lastBlockNumber,
-            position.lastTransactionIndex,
-            position.lastLogIndex,
-            limit
-        )
-    ),
-    initialPosition: (lastCommittedBlock) => ({
-        lastBlockNumber: lastCommittedBlock,
-        lastTransactionIndex: -1,
-        lastLogIndex: -1,
-    }),
-    toPosition: (event) => ({
-        lastBlockNumber: event.blockNumber,
-        lastTransactionIndex: event.transactionIndex,
-        lastLogIndex: event.index,
-    }),
-    handler,
-});
+const worker = await EventReactionWorker.create({config, logger, dbUrl, lockKey, handler});
+
+process.once("SIGINT", () => process.exit(0));
+process.once("SIGTERM", () => process.exit(0));
+
+await worker.start();
