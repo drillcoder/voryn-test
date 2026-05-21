@@ -1,4 +1,5 @@
-import {ConsoleLogger, TransactionReactionWorker} from "@drillcoder/voryn";
+import {ConsoleLogger, PostgresTransactionsRepository} from "@drillcoder/voryn";
+import {startBatchedReactionWorker} from "./batched-reaction-worker.js";
 
 const config = {
     chainId: Number(process.env.BSC_CHAIN_ID),
@@ -37,9 +38,30 @@ const handler = {
     },
 };
 
-const worker = await TransactionReactionWorker.create({config, logger, dbUrl, lockKey, handler});
-
-process.once("SIGINT", () => process.exit(0));
-process.once("SIGTERM", () => process.exit(0));
-
-await worker.start();
+await startBatchedReactionWorker({
+    config,
+    logger,
+    dbUrl,
+    lockKey,
+    streamType: "tx",
+    sourceName: "transaction",
+    repositoryFactory: (pool) => new PostgresTransactionsRepository(pool),
+    listAfterPosition: (repository, chainId, maxBlockNumber, position, limit) => (
+        repository.listAfterPosition(
+            chainId,
+            maxBlockNumber,
+            position.lastBlockNumber,
+            position.lastTransactionIndex,
+            limit
+        )
+    ),
+    initialPosition: (lastCommittedBlock) => ({
+        lastBlockNumber: lastCommittedBlock,
+        lastTransactionIndex: -1,
+    }),
+    toPosition: (tx) => ({
+        lastBlockNumber: tx.blockNumber,
+        lastTransactionIndex: tx.index,
+    }),
+    handler,
+});
