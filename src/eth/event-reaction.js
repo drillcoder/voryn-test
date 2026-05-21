@@ -5,11 +5,11 @@ const config = {
     delayBetweenTicksMs: 500,
     workerName: "event-reaction-worker",
     batchSize: 2_500,
+    skipFlushInterval: 500,
 };
 
 const logger = new ConsoleLogger({minLevel: "info"});
 const dbUrl = process.env.DB_URL;
-const lockKey = 2n;
 
 const handler = {
     async handle(event) {
@@ -17,10 +17,12 @@ const handler = {
             blockNumber: event.blockNumber,
             index: event.index,
         });
+
+        return event.index === 0 ? 'processed' : 'skipped';
     },
 };
 
-const worker = await EventReactionWorker.create({config, logger, dbUrl, lockKey, handler});
+const worker = await EventReactionWorker.create({config, logger, dbUrl, handler});
 
 process.once("SIGINT", () => process.exit(0));
 process.once("SIGTERM", () => process.exit(0));

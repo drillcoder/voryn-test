@@ -5,11 +5,11 @@ const config = {
     delayBetweenTicksMs: 500,
     workerName: "transaction-reaction-worker",
     batchSize: 500,
+    skipFlushInterval: 100,
 };
 
 const logger = new ConsoleLogger({minLevel: "info"});
 const dbUrl = process.env.DB_URL;
-const lockKey = 1n;
 
 const handler = {
     async handle(tx) {
@@ -17,10 +17,12 @@ const handler = {
             blockNumber: tx.blockNumber,
             index: tx.index,
         });
+
+        return event.index === 0 ? 'processed' : 'skipped';
     },
 };
 
-const worker = await TransactionReactionWorker.create({config, logger, dbUrl, lockKey, handler});
+const worker = await TransactionReactionWorker.create({config, logger, dbUrl, handler});
 
 process.once("SIGINT", () => process.exit(0));
 process.once("SIGTERM", () => process.exit(0));

@@ -4,12 +4,12 @@ const config = {
     chainId: Number(process.env.BSC_CHAIN_ID),
     delayBetweenTicksMs: 100,
     workerName: "event-reaction-worker",
-    batchSize: 10_000,
+    batchSize: 5_000,
+    skipFlushInterval: 1000,
 };
 
 const logger = new ConsoleLogger({minLevel: "info"});
 const dbUrl = process.env.DB_URL;
-const lockKey = 102n;
 
 const handler = {
     async handle(event) {
@@ -17,10 +17,12 @@ const handler = {
             blockNumber: event.blockNumber,
             index: event.index,
         });
+
+        return event.index === 0 ? 'processed' : 'skipped';
     },
 };
 
-const worker = await EventReactionWorker.create({config, logger, dbUrl, lockKey, handler});
+const worker = await EventReactionWorker.create({config, logger, dbUrl, handler});
 
 process.once("SIGINT", () => process.exit(0));
 process.once("SIGTERM", () => process.exit(0));
