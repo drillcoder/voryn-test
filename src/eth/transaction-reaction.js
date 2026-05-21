@@ -2,9 +2,9 @@ import {ConsoleLogger, TransactionReactionWorker} from "@drillcoder/voryn";
 
 const config = {
     chainId: Number(process.env.ETH_CHAIN_ID),
-    delayBetweenTicksMs: 100,
+    delayBetweenTicksMs: 500,
     workerName: "transaction-reaction-worker",
-    batchSize: 2_000,
+    batchSize: 500,
 };
 
 const logger = new ConsoleLogger({minLevel: "info"});

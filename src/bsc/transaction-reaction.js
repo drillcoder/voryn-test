@@ -2,9 +2,9 @@ import {ConsoleLogger, TransactionReactionWorker} from "@drillcoder/voryn";
 
 const config = {
     chainId: Number(process.env.BSC_CHAIN_ID),
-    delayBetweenTicksMs: 500,
+    delayBetweenTicksMs: 250,
     workerName: "transaction-reaction-worker",
-    batchSize: 1_000,
+    batchSize: 2_000,
 };
 
 const logger = new ConsoleLogger({minLevel: "info"});

@@ -2,9 +2,9 @@ import {ConsoleLogger, EventReactionWorker} from "@drillcoder/voryn";
 
 const config = {
     chainId: Number(process.env.BSC_CHAIN_ID),
-    delayBetweenTicksMs: 500,
+    delayBetweenTicksMs: 250,
     workerName: "event-reaction-worker",
-    batchSize: 5_000,
+    batchSize: 10_000,
 };
 
 const logger = new ConsoleLogger({minLevel: "info"});
