@@ -12,13 +12,13 @@ const logger = new ConsoleLogger({minLevel: "info"});
 const dbUrl = process.env.DB_URL;
 
 const handler = {
-    async handle(tx) {
+    async handle(transaction) {
         logger.info("transaction_received", {
-            blockNumber: tx.blockNumber,
-            index: tx.index,
+            blockNumber: transaction.blockNumber,
+            index: transaction.index,
         });
 
-        return event.index === 0 ? 'processed' : 'skipped';
+        return transaction.index === 0 ? 'processed' : 'skipped';
     },
 };
 
