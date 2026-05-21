@@ -11,12 +11,29 @@ const logger = new ConsoleLogger({minLevel: "info"});
 const dbUrl = process.env.DB_URL;
 const lockKey = 101n;
 
+let processed = 0;
+let lastProcessed = 0;
+let lastTs = Date.now();
+
+setInterval(() => {
+    const now = Date.now();
+    const delta = processed - lastProcessed;
+    const seconds = (now - lastTs) / 1000;
+
+    logger.info("transaction_reaction_rate", {
+        chainId: config.chainId,
+        workerName: config.workerName,
+        processedTotal: processed,
+        processedPerSecond: delta / seconds,
+    });
+
+    lastProcessed = processed;
+    lastTs = now;
+}, 5_000).unref();
+
 const handler = {
     async handle(tx) {
-        logger.info("transaction_received", {
-            blockNumber: tx.blockNumber,
-            index: tx.index,
-        });
+        processed += 1;
     },
 };
 
