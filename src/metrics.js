@@ -3,57 +3,19 @@ import { ConsoleLogger, PipelineMetrics } from "@drillcoder/voryn";
 
 const logger = new ConsoleLogger({ minLevel: "info" });
 const dbUrl = process.env.DB_URL;
-const port = Number(process.env.PORT ?? 8080);
+const port = 8080;
 
-const chains = [
-  {
-    name: "eth",
-    config: { chainId: Number(process.env.ETH_CHAIN_ID) },
-    rpcUrl: process.env.ETH_RPC_URL,
-  },
-  {
-    name: "bsc",
-    config: { chainId: Number(process.env.BSC_CHAIN_ID) },
-    rpcUrl: process.env.BSC_RPC_URL,
-  },
+const chainIds = [
+  Number(process.env.ETH_CHAIN_ID),
+  Number(process.env.BSC_CHAIN_ID),
 ];
 
-const metrics = await Promise.all(
-  chains.map(async (chain) => ({
-    ...chain,
-    metrics: await PipelineMetrics.create({
-      config: chain.config,
-      logger,
-      dbUrl,
-      rpcUrl: chain.rpcUrl,
-    }),
-  }))
-);
+const rpcUrls = [
+  process.env.ETH_RPC_URL,
+  process.env.BSC_RPC_URL,
+];
 
-function mergePrometheusDocuments(documents) {
-  const seenMetadata = new Set();
-  const lines = [];
-
-  for (const document of documents) {
-    for (const line of document.split("\n")) {
-      const metadataMatch = line.match(/^# (HELP|TYPE) ([^ ]+)/);
-
-      if (metadataMatch) {
-        const metadataKey = `${metadataMatch[1]}:${metadataMatch[2]}`;
-
-        if (seenMetadata.has(metadataKey)) {
-          continue;
-        }
-
-        seenMetadata.add(metadataKey);
-      }
-
-      lines.push(line);
-    }
-  }
-
-  return `${lines.join("\n").trim()}\n`;
-}
+const metrics = await PipelineMetrics.create({ logger, dbUrl, chainIds, rpcUrls });
 
 function sendText(response, statusCode, body, contentType = "text/plain; charset=utf-8") {
   response.writeHead(statusCode, {
@@ -73,14 +35,10 @@ const server = createServer(async (request, response) => {
     }
 
     if (url.pathname === "/metrics") {
-      const documents = await Promise.all(
-        metrics.map(({ metrics: chainMetrics }) => chainMetrics.getPrometheus())
-      );
-
       sendText(
         response,
         200,
-        mergePrometheusDocuments(documents),
+        await metrics.getPrometheus(),
         "text/plain; version=0.0.4; charset=utf-8"
       );
       return;
@@ -93,19 +51,11 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, () => {
-  logger.info("metrics_server_started", {
-    port,
-    chains: metrics.map((chain) => ({
-      name: chain.name,
-      chainId: chain.config.chainId,
-    })),
-  });
-});
+server.listen(port, () => logger.info("metrics_server_started", { port, chainIds }));
 
 async function shutdown() {
   server.close();
-  await Promise.all(metrics.map(({ metrics: chainMetrics }) => chainMetrics.close()));
+  await metrics.close();
 }
 
 process.once("SIGINT", () => {

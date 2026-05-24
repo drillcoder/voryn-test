@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "dependencies": {
-    "@drillcoder/voryn": "^0.3.0"
+    "@drillcoder/voryn": "^0.4.0"
   },
   "private": true
 }

@@ -1,17 +1,15 @@
-import {ConsoleLogger, HeadWorker} from "@drillcoder/voryn";
+import {HeadWorker} from "@drillcoder/voryn";
 
-const config = {
+const options = {
+    dbUrl: process.env.DB_URL,
+    logLevel: "info",
     chainId: Number(process.env.BSC_CHAIN_ID),
+    rpcUrl: process.env.BSC_RPC_URL,
     delayBetweenTicksMs: 1_000,
     confirmations: 0,
     depthBlocks: 50_000
 };
-
-const logger = new ConsoleLogger({minLevel: "info"});
-const dbUrl = process.env.DB_URL;
-const rpcUrl = process.env.BSC_RPC_URL;
-
-const worker = await HeadWorker.create({config, logger, dbUrl, rpcUrl});
+const worker = await HeadWorker.create(options);
 
 process.once("SIGINT", () => process.exit(0));
 process.once("SIGTERM", () => process.exit(0));

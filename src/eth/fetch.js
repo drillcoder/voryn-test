@@ -1,7 +1,10 @@
-import {ConsoleLogger, FetchWorker} from "@drillcoder/voryn";
+import {FetchWorker} from "@drillcoder/voryn";
 
-const config = {
+const options = {
+    dbUrl: process.env.DB_URL,
+    logLevel: "info",
     chainId: Number(process.env.ETH_CHAIN_ID),
+    rpcUrl: process.env.ETH_RPC_URL,
     delayBetweenTicksMs: 1_000,
     fetchBatchSize: 5,
     fetchConcurrency: 1,
@@ -10,12 +13,7 @@ const config = {
     retryBaseDelayMs: 1_000,
     retryMaxDelayMs: 10_000,
 };
-
-const logger = new ConsoleLogger({minLevel: "info"});
-const dbUrl = process.env.DB_URL;
-const rpcUrl = process.env.ETH_RPC_URL;
-
-const worker = await FetchWorker.create({config, logger, dbUrl, rpcUrl});
+const worker = await FetchWorker.create(options);
 
 process.once("SIGINT", () => process.exit(0));
 process.once("SIGTERM", () => process.exit(0));

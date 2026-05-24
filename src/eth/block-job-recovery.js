@@ -1,16 +1,14 @@
 import { BlockJobRecovery, ConsoleLogger } from "@drillcoder/voryn";
 
-const config = {
+const options = {
+    dbUrl: process.env.DB_URL,
+    logLevel: "info",
     chainId: Number(process.env.ETH_CHAIN_ID),
 };
-const blockNumber = Number(process.argv[2]);
-
-const logger = new ConsoleLogger({ minLevel: "info" });
-const dbUrl = process.env.DB_URL;
-
-const recovery = await BlockJobRecovery.create({ config, logger, dbUrl });
+const recovery = await BlockJobRecovery.create(options);
 
 try {
+    const blockNumber = Number(process.argv[2]);
     const singleBlockResult = await recovery.retryFailedBlock(blockNumber);
 
     console.log(JSON.stringify(singleBlockResult, null, 2));
