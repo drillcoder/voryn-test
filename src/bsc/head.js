@@ -7,7 +7,7 @@ const options = {
     rpcUrl: process.env.BSC_RPC_URL,
     delayBetweenTicksMs: 1_000,
     confirmations: 0,
-    depthBlocks: 50_000
+    depthBlocks: 150_000
 };
 const worker = await HeadWorker.create(options);
 
