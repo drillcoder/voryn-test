@@ -4,7 +4,7 @@ const options = {
     dbUrl: process.env.DB_URL,
     logLevel: "info",
     chainId: Number(process.env.BSC_CHAIN_ID),
-    delayBetweenTicksMs: 5_000,
+    delayBetweenTicksMs: 60_000,
     retentionDepthBlocks: 192_000,
 };
 const worker = await RetentionWorker.create(options);
