@@ -2,7 +2,7 @@ import {HeadWorker} from "@drillcoder/voryn";
 
 const options = {
     dbUrl: process.env.DB_URL,
-    logLevel: "debug",
+    logLevel: "info",
     chainId: Number(process.env.ETH_CHAIN_ID),
     rpcUrl: process.env.ETH_RPC_URL,
     delayBetweenTicksMs: 1_000,
