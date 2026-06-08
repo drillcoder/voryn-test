@@ -6,10 +6,17 @@ x-app-env: &app-env
   BSC_CHAIN_ID: 56
   BSC_RPC_URL: https://bsc-rpc.publicnode.com
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "100m"
+    max-file: "5"
+
 x-app: &app
   image: node:24-bookworm-slim
   working_dir: /app
   environment: *app-env
+  logging: *default-logging
   volumes:
     - ./package.json:/app/package.json:ro
     - ./src:/app/src:ro
@@ -23,6 +30,7 @@ services:
   app-deps:
     image: node:24-bookworm-slim
     working_dir: /app
+    logging: *default-logging
     environment:
       NODE_ENV: production
     command: [ "npm", "ci", "--omit=dev" ]
@@ -34,6 +42,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    logging: *default-logging
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
@@ -118,6 +127,7 @@ services:
 
   alloy:
     image: grafana/alloy:latest
+    logging: *default-logging
     command:
       - run
       - --server.http.listen-addr=0.0.0.0:12345
