@@ -6,7 +6,7 @@ const options = {
     chainId: Number(process.env.BSC_CHAIN_ID),
     rpcUrl: process.env.BSC_RPC_URL,
     delayBetweenTicksMs: 500,
-    fetchBatchSize: 10,
+    fetchBatchSize: 5,
     fetchConcurrency: 5,
     fetchClaimTtlMs: 30_000,
     retryMaxAttempts: 10,
