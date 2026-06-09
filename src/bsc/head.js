@@ -5,7 +5,7 @@ const options = {
     logLevel: "info",
     chainId: Number(process.env.BSC_CHAIN_ID),
     rpcUrl: process.env.BSC_RPC_URL,
-    delayBetweenTicksMs: 1_000,
+    delayBetweenTicksMs: 500,
     confirmations: 0,
     depthBlocks: 150_000
 };
